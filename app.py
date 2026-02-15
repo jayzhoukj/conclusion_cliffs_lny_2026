@@ -149,6 +149,18 @@ col3.metric("Fantasy Multiplier", f"{fantasy_postscript_multiplier:.0f}x")
 col4.metric("Diamonds per Cycle", f"{n_diamonds_per_cycle:.0f}")
 col5.metric("Required Cycles", f"{required_cycles:.2f}")
 
+# --- Optimal scenario metrics ---
+df["max_cycles"] = df[["n_cycles_t2", "n_cycles_t3"]].min(axis=1)
+best_idx = df["max_cycles"].idxmax()
+best_row = df.loc[best_idx]
+
+col6, col7 = st.columns(2)
+col6.metric("Max Achievable Cycles", f"{best_row['max_cycles']:.2f}")
+col7.metric(
+    "Optimal Fantasy Postscript Hunts",
+    f"T1 = {best_row['n_hunts_t1_fantasy_postscript']:.0f} / T2 = {best_row['n_hunts_t2_fantasy_postscript']:.0f}",
+)
+
 # --- Simulation results table ---
 st.subheader("Simulation Results")
 st.dataframe(df, use_container_width=True)
