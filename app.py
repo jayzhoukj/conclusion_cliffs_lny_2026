@@ -117,7 +117,7 @@ st.sidebar.header("Materials & Diamonds")
 n_t2_mats = st.sidebar.number_input("Available T2 Materials", min_value=0, value=1000, step=1)
 n_t3_mats = st.sidebar.number_input("Available T3 Materials", min_value=0, value=500, step=1)
 required_diamonds = st.sidebar.number_input("Required Diamonds", min_value=0, value=355, step=1)
-available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, value=3, step=1)
+available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, value=0, step=1)
 
 st.sidebar.header("Chart Settings")
 max_cycles_cap = st.sidebar.number_input("Max Cycles Cap (for charts)", min_value=1, value=30, step=1)
