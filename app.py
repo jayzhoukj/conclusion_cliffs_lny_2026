@@ -85,7 +85,7 @@ def run_simulation(
 
 
 # --- Page config ---
-st.set_page_config(page_title="Cliffs Simulator — LNY 2026", layout="wide")
+st.set_page_config(page_title="Cliffs Simulator — LNY 2026", page_icon="⛰️", layout="wide")
 st.title("Cliffs Simulator — LNY 2026")
 
 # --- Sidebar parameters ---
