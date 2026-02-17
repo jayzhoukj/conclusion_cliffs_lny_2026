@@ -151,14 +151,14 @@ fantasy_diamond_multiplier = 1 + (1 * (candle_fantasy == "White Candle") + 2 * (
 
 st.sidebar.header("Materials & Diamonds")
 
-n_t2_mats = st.sidebar.number_input("Available T2 Materials", min_value=0, value=1551, step=1)
-n_t3_mats = st.sidebar.number_input("Available T3 Materials", min_value=0, value=794, step=1)
-required_diamonds = st.sidebar.number_input("Required Diamonds", min_value=0, value=225, step=1)
-available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, value=3, step=1)
+n_t2_mats = st.sidebar.number_input("Available T2 Materials", min_value=0, value=1000, step=1)
+n_t3_mats = st.sidebar.number_input("Available T3 Materials", min_value=0, value=500, step=1)
+required_diamonds = st.sidebar.number_input("Required Diamonds", min_value=0, value=355, step=1)
+available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, value=0, step=1)
 
 st.sidebar.header("Motivation Mallets")
 
-n_mallets = st.sidebar.number_input("Available Mallets", min_value=0, value=180, step=1)
+n_mallets = st.sidebar.number_input("Available Mallets", min_value=0, value=50, step=1)
 noto_break_block = st.sidebar.checkbox("Noto: Break Block (30 mallets)", value=True)
 fantasy_postscript_break_block = st.sidebar.checkbox("Fantasy: Break Block (30 mallets)", value=True)
 fantasy_writing_short_only = st.sidebar.checkbox("Fantasy: Writing Short Only", value=True)
