@@ -159,47 +159,71 @@ page = st.navigation([
     st.Page("pages/event.py", title="LNY Event", icon="🧧"),
 ])
 
+# --- Initialize widget defaults from query params (first load only) ---
+if "_initialized" not in st.session_state:
+    st.session_state["w_t1w"] = qp_int("t1w", 80)
+    st.session_state["w_t2w"] = qp_int("t2w", 40)
+    st.session_state["w_ccw"] = qp_bool("ccw", True)
+    st.session_state["w_cw"] = CANDLE_OPTIONS[qp_radio_index("cw", 0)]
+    st.session_state["w_t3n"] = qp_int("t3n", 13)
+    st.session_state["w_bk"] = qp_bool("bk", True)
+    st.session_state["w_ccn"] = qp_bool("ccn", True)
+    st.session_state["w_cn"] = CANDLE_OPTIONS[qp_radio_index("cn", 1)]
+    st.session_state["w_ccf"] = qp_bool("ccf", True)
+    st.session_state["w_cf"] = CANDLE_OPTIONS[qp_radio_index("cf", 2)]
+    st.session_state["w_t2m"] = qp_int("t2m", 1000)
+    st.session_state["w_t3m"] = qp_int("t3m", 500)
+    st.session_state["w_rd"] = qp_int("rd", 355)
+    st.session_state["w_ad"] = qp_int("ad", 0)
+    st.session_state["w_mal"] = qp_int("mal", 50)
+    st.session_state["w_nbb"] = qp_bool("nbb", True)
+    st.session_state["w_fbb"] = qp_bool("fbb", True)
+    st.session_state["w_fws"] = qp_bool("fws", True)
+    st.session_state["w_fpe"] = qp_bool("fpe", True)
+    st.session_state["w_cap"] = qp_int("cap", 30, min_value=1)
+    st.session_state["_initialized"] = True
+
 # --- Shared sidebar parameters ---
 st.sidebar.header("Writing Phase")
 
-n_hunts_t1_writing = st.sidebar.number_input("T1 Writing Hunts", min_value=0, value=qp_int("t1w", 80), step=10)
-n_hunts_t2_writing = st.sidebar.number_input("T2 Writing Hunts", min_value=0, value=qp_int("t2w", 40), step=10)
-cc_writing = st.sidebar.checkbox("Condensed Creativity (Writing)", value=qp_bool("ccw", True))
-candle_writing = st.sidebar.radio("LNY 2026 Candle (Writing)", CANDLE_OPTIONS, index=qp_radio_index("cw", 0))
+n_hunts_t1_writing = st.sidebar.number_input("T1 Writing Hunts", min_value=0, step=10, key="w_t1w")
+n_hunts_t2_writing = st.sidebar.number_input("T2 Writing Hunts", min_value=0, step=10, key="w_t2w")
+cc_writing = st.sidebar.checkbox("Condensed Creativity (Writing)", key="w_ccw")
+candle_writing = st.sidebar.radio("LNY 2026 Candle (Writing)", CANDLE_OPTIONS, key="w_cw")
 writing_multiplier = compute_multiplier(cc_writing, candle_writing == "White Candle", candle_writing == "Red Candle")
 
 st.sidebar.header("Postscript Phase (Noto)")
 
-n_hunts_t3_noto_postscript = st.sidebar.number_input("Noto Charging Hunts (T3)", min_value=0, value=qp_int("t3n", 13), step=1)
-bk = st.sidebar.checkbox("Baitkeep Charm (T3 Cheese)", value=qp_bool("bk", True))
-cc_noto = st.sidebar.checkbox("Condensed Creativity (Noto)", value=qp_bool("ccn", True))
-candle_noto = st.sidebar.radio("LNY 2026 Candle (Noto)", CANDLE_OPTIONS, index=qp_radio_index("cn", 1))
+n_hunts_t3_noto_postscript = st.sidebar.number_input("Noto Charging Hunts (T3)", min_value=0, step=1, key="w_t3n")
+bk = st.sidebar.checkbox("Baitkeep Charm (T3 Cheese)", key="w_bk")
+cc_noto = st.sidebar.checkbox("Condensed Creativity (Noto)", key="w_ccn")
+candle_noto = st.sidebar.radio("LNY 2026 Candle (Noto)", CANDLE_OPTIONS, key="w_cn")
 noto_postscript_multiplier = compute_multiplier(cc_noto, candle_noto == "White Candle", candle_noto == "Red Candle")
 
 st.sidebar.header("Postscript Phase (Fantasy)")
 
-cc_fantasy = st.sidebar.checkbox("Condensed Creativity (Fantasy)", value=qp_bool("ccf", True))
-candle_fantasy = st.sidebar.radio("LNY 2026 Candle (Fantasy)", CANDLE_OPTIONS, index=qp_radio_index("cf", 2))
+cc_fantasy = st.sidebar.checkbox("Condensed Creativity (Fantasy)", key="w_ccf")
+candle_fantasy = st.sidebar.radio("LNY 2026 Candle (Fantasy)", CANDLE_OPTIONS, key="w_cf")
 fantasy_postscript_multiplier = compute_multiplier(cc_fantasy, candle_fantasy == "White Candle", candle_fantasy == "Red Candle")
 fantasy_diamond_multiplier = 1 + (1 * (candle_fantasy == "White Candle") + 2 * (candle_fantasy == "Red Candle"))
 
 st.sidebar.header("Materials & Diamonds")
 
-n_t2_mats = st.sidebar.number_input("Available T2 Materials", min_value=0, value=qp_int("t2m", 1000), step=1)
-n_t3_mats = st.sidebar.number_input("Available T3 Materials", min_value=0, value=qp_int("t3m", 500), step=1)
-required_diamonds = st.sidebar.number_input("Required Diamonds", min_value=0, value=qp_int("rd", 355), step=1)
-available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, value=qp_int("ad", 0), step=1)
+n_t2_mats = st.sidebar.number_input("Available T2 Materials", min_value=0, step=1, key="w_t2m")
+n_t3_mats = st.sidebar.number_input("Available T3 Materials", min_value=0, step=1, key="w_t3m")
+required_diamonds = st.sidebar.number_input("Required Diamonds", min_value=0, step=1, key="w_rd")
+available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, step=1, key="w_ad")
 
 st.sidebar.header("Motivation Mallets")
 
-n_mallets = st.sidebar.number_input("Available Mallets", min_value=0, value=qp_int("mal", 50), step=1)
-noto_break_block = st.sidebar.checkbox("Noto: Break Block (30 mallets)", value=qp_bool("nbb", True))
-fantasy_postscript_break_block = st.sidebar.checkbox("Fantasy: Break Block (30 mallets)", value=qp_bool("fbb", True))
-fantasy_writing_short_only = st.sidebar.checkbox("Fantasy: Writing Short Only", value=qp_bool("fws", True))
-fantasy_postscript_extend = st.sidebar.checkbox("Fantasy: Extend Postscript (30 mallets)", value=qp_bool("fpe", True))
+n_mallets = st.sidebar.number_input("Available Mallets", min_value=0, step=1, key="w_mal")
+noto_break_block = st.sidebar.checkbox("Noto: Break Block (30 mallets)", key="w_nbb")
+fantasy_postscript_break_block = st.sidebar.checkbox("Fantasy: Break Block (30 mallets)", key="w_fbb")
+fantasy_writing_short_only = st.sidebar.checkbox("Fantasy: Writing Short Only", key="w_fws")
+fantasy_postscript_extend = st.sidebar.checkbox("Fantasy: Extend Postscript (30 mallets)", key="w_fpe")
 
 st.sidebar.header("Chart Settings")
-max_cycles_cap = st.sidebar.number_input("Max Cycles Cap (for charts)", min_value=1, value=qp_int("cap", 30, min_value=1), step=1)
+max_cycles_cap = st.sidebar.number_input("Max Cycles Cap (for charts)", min_value=1, step=1, key="w_cap")
 
 # --- Save settings to URL ---
 st.sidebar.divider()
