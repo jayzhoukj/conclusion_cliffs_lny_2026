@@ -204,29 +204,31 @@ max_cycles_cap = st.sidebar.number_input("Max Cycles Cap (for charts)", min_valu
 # --- Save settings to URL ---
 st.sidebar.divider()
 if st.sidebar.button("Save Settings to URL"):
-    st.query_params.update(
-        t1w=n_hunts_t1_writing,
-        t2w=n_hunts_t2_writing,
-        ccw=int(cc_writing),
-        cw=CANDLE_OPTIONS.index(candle_writing),
-        t3n=n_hunts_t3_noto_postscript,
-        bk=int(bk),
-        ccn=int(cc_noto),
-        cn=CANDLE_OPTIONS.index(candle_noto),
-        ccf=int(cc_fantasy),
-        cf=CANDLE_OPTIONS.index(candle_fantasy),
-        t2m=n_t2_mats,
-        t3m=n_t3_mats,
-        rd=required_diamonds,
-        ad=available_diamonds,
-        mal=n_mallets,
-        nbb=int(noto_break_block),
-        fbb=int(fantasy_postscript_break_block),
-        fws=int(fantasy_writing_short_only),
-        fpe=int(fantasy_postscript_extend),
-        cap=max_cycles_cap,
-    )
     st.session_state["_settings_saved"] = True
+    params = {
+        "t1w": str(n_hunts_t1_writing),
+        "t2w": str(n_hunts_t2_writing),
+        "ccw": str(int(cc_writing)),
+        "cw": str(CANDLE_OPTIONS.index(candle_writing)),
+        "t3n": str(n_hunts_t3_noto_postscript),
+        "bk": str(int(bk)),
+        "ccn": str(int(cc_noto)),
+        "cn": str(CANDLE_OPTIONS.index(candle_noto)),
+        "ccf": str(int(cc_fantasy)),
+        "cf": str(CANDLE_OPTIONS.index(candle_fantasy)),
+        "t2m": str(n_t2_mats),
+        "t3m": str(n_t3_mats),
+        "rd": str(required_diamonds),
+        "ad": str(available_diamonds),
+        "mal": str(n_mallets),
+        "nbb": str(int(noto_break_block)),
+        "fbb": str(int(fantasy_postscript_break_block)),
+        "fws": str(int(fantasy_writing_short_only)),
+        "fpe": str(int(fantasy_postscript_extend)),
+        "cap": str(max_cycles_cap),
+    }
+    st.query_params.clear()
+    st.query_params.update(params)
 
 if st.session_state.pop("_settings_saved", False):
     st.sidebar.success("URL updated! Bookmark this page to save your settings.")
