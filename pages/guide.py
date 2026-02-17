@@ -87,6 +87,27 @@ The **LNY Event** page provides a dashboard view with:
 
 ---
 
+## Saving & Restoring Your Settings
+
+Your sidebar inputs are **not** saved automatically between sessions. However, you can preserve
+them using the **Save Settings to URL** button at the bottom of the sidebar.
+
+### How to Save
+1. Adjust all sidebar inputs to your desired values.
+2. Scroll to the bottom of the sidebar and click **Save Settings to URL**.
+3. The browser URL will update to include all your current settings as query parameters
+   (e.g., `?t1w=80&t2w=40&ccw=1&...`).
+4. **Bookmark the URL** in your browser to save your configuration.
+
+### How to Restore
+- Open your bookmark — all sidebar inputs will be pre-filled with the saved values.
+
+### Sharing Settings
+- You can share your bookmarked URL with others. Anyone who opens the link will see the
+  same sidebar configuration, regardless of whether they are logged into Streamlit Cloud.
+
+---
+
 ## Key Concepts
 
 - **Cycle** — One full loop through Writing + Noto Postscript + Fantasy Postscript phases.
