@@ -86,7 +86,7 @@ def run_simulation(
 
         # T3 mats
         n_hunts_t3_total = n_hunts_t3_noto_postscript
-        t3_mats_used = n_hunts_t3_total * 30 * (1 / (1 + bk))
+        t3_mats_used = n_hunts_t3_total * 30 * (1 / (1 + (bk * 0.5)))
         t3_mats_farmed = (n_hunts_t2_writing * 1.2 * writing_multiplier) + (
             n_hunts_t2_fantasy_postscript * 3 * fantasy_postscript_multiplier
         )
@@ -181,6 +181,7 @@ if "_initialized" not in st.session_state:
     st.session_state["w_fws"] = qp_bool("fws", True)
     st.session_state["w_fpe"] = qp_bool("fpe", True)
     st.session_state["w_cap"] = qp_int("cap", 30, min_value=1)
+    st.session_state["w_hpd"] = qp_int("hpd", 80, min_value=1)
     st.session_state["_initialized"] = True
 
 # --- Shared sidebar parameters ---
@@ -222,6 +223,10 @@ fantasy_postscript_break_block = st.sidebar.checkbox("Fantasy: Break Block (30 m
 fantasy_writing_short_only = st.sidebar.checkbox("Fantasy: Writing Short Only", key="w_fws")
 fantasy_postscript_extend = st.sidebar.checkbox("Fantasy: Extend Postscript (30 mallets)", key="w_fpe")
 
+st.sidebar.header("Event Settings")
+hunts_per_day = st.sidebar.number_input("Hunts per Day", min_value=1, step=10, key="w_hpd",
+                                        help="How many hunts you complete per day on average.")
+
 st.sidebar.header("Chart Settings")
 max_cycles_cap = st.sidebar.number_input("Max Cycles Cap (for charts)", min_value=1, step=1, key="w_cap")
 
@@ -250,6 +255,7 @@ if st.sidebar.button("Save Settings to URL"):
         "fws": str(int(fantasy_writing_short_only)),
         "fpe": str(int(fantasy_postscript_extend)),
         "cap": str(max_cycles_cap),
+        "hpd": str(hunts_per_day),
     }
     st.query_params.clear()
     st.query_params.update(params)
@@ -299,6 +305,7 @@ st.session_state["n_t2_mats"] = n_t2_mats
 st.session_state["n_t3_mats"] = n_t3_mats
 st.session_state["n_mallets"] = n_mallets
 st.session_state["max_cycles_cap"] = max_cycles_cap
+st.session_state["hunts_per_day"] = hunts_per_day
 
 # --- Run the selected page ---
 page.run()

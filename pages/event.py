@@ -46,11 +46,7 @@ n_diamonds_per_cycle = st.session_state["n_diamonds_per_cycle"]
 st.subheader("Time Constraint")
 
 HUNTS_PER_CYCLE = 143
-
-hunts_per_day = st.number_input(
-    "Hunts per day", min_value=1, value=80, step=10,
-    help="How many hunts you complete per day on average.",
-)
+hunts_per_day = st.session_state["hunts_per_day"]
 
 event_end = datetime(2026, 2, 24, 16, 0, 0, tzinfo=timezone.utc)
 now = datetime.now(timezone.utc)
