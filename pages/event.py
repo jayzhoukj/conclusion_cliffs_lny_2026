@@ -48,7 +48,7 @@ st.subheader("Time Constraint")
 HUNTS_PER_CYCLE = 143
 
 hunts_per_day = st.number_input(
-    "Hunts per day", min_value=1, value=100, step=10,
+    "Hunts per day", min_value=1, value=80, step=10,
     help="How many hunts you complete per day on average.",
 )
 
