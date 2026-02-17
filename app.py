@@ -23,6 +23,11 @@ def run_simulation(
     n_t3_mats,
     required_diamonds,
     available_diamonds,
+    n_mallets,
+    noto_break_block,
+    fantasy_postscript_break_block,
+    fantasy_writing_short_only,
+    fantasy_postscript_extend,
 ):
     n_diamonds_per_cycle = 13 * fantasy_diamond_multiplier
     required_cycles = (
@@ -54,13 +59,36 @@ def run_simulation(
         net_t3_mats = t3_mats_farmed - t3_mats_used
         n_cycles_t3 = 999 if net_t3_mats > 0 else (n_t3_mats / -net_t3_mats if net_t3_mats != 0 else 999)
 
+        # Mallets
+        noto_extend_ps_probability = 0.2
+        mallets_used = (
+            noto_break_block * 30
+            + 19  # noto writing
+            + noto_extend_ps_probability * 30
+            + fantasy_postscript_break_block * 30
+            + 5.18 * 5  # fantasy writing (med / short)
+            + fantasy_writing_short_only * ((12.52 - 5.18) * 5)
+            + fantasy_postscript_extend * 30
+        )
+        no_extend_prob = 0.5
+        avg_noto_ps_hunts = (
+            (no_extend_prob / (no_extend_prob + noto_extend_ps_probability)) * 10
+            + (noto_extend_ps_probability / (no_extend_prob + noto_extend_ps_probability)) * 13
+        )
+        mallets_farmed = (
+            0.6 * noto_postscript_multiplier * avg_noto_ps_hunts
+            + 2.5 * fantasy_postscript_multiplier * 13
+        )
+        net_mallets = mallets_farmed - mallets_used
+        n_cycles_mallets = 999 if net_mallets >= 0 else (n_mallets / -net_mallets if net_mallets != 0 else 999)
+
         # CC used
         cc_hunts_per_cycle = (
             cc_writing * (n_hunts_t1_writing + n_hunts_t2_writing)
             + cc_noto * n_hunts_t3_noto_postscript
             + cc_fantasy * 13
         )
-        n_cc_used = min(n_cycles_t2, n_cycles_t3, required_cycles) * cc_hunts_per_cycle
+        n_cc_used = min(n_cycles_t2, n_cycles_t3, n_cycles_mallets, required_cycles) * cc_hunts_per_cycle
 
         all_simulation_data.append(
             {
@@ -77,6 +105,10 @@ def run_simulation(
                 "t3_mats_farmed": t3_mats_farmed,
                 "net_t3_mats": net_t3_mats,
                 "n_cycles_t3": n_cycles_t3,
+                "mallets_used": mallets_used,
+                "mallets_farmed": mallets_farmed,
+                "net_mallets": net_mallets,
+                "n_cycles_mallets": n_cycles_mallets,
                 "n_cc_used": n_cc_used,
             }
         )
@@ -84,11 +116,16 @@ def run_simulation(
     return pd.DataFrame(all_simulation_data), n_diamonds_per_cycle, required_cycles
 
 
-# --- Page config ---
+# --- Page config & navigation ---
 st.set_page_config(page_title="Cliffs Simulator — LNY 2026", page_icon="⛰️", layout="wide")
-st.title("Cliffs Simulator — LNY 2026")
 
-# --- Sidebar parameters ---
+page = st.navigation([
+    st.Page("pages/guide.py", title="User Guide", icon="📖"),
+    st.Page("pages/simulator.py", title="Cliffs Simulator", icon="⛰️"),
+    st.Page("pages/event.py", title="LNY Event", icon="🧧"),
+])
+
+# --- Shared sidebar parameters ---
 st.sidebar.header("Writing Phase")
 
 n_hunts_t1_writing = st.sidebar.number_input("T1 Writing Hunts", min_value=0, value=80, step=10)
@@ -114,10 +151,18 @@ fantasy_diamond_multiplier = 1 + (1 * (candle_fantasy == "White Candle") + 2 * (
 
 st.sidebar.header("Materials & Diamonds")
 
-n_t2_mats = st.sidebar.number_input("Available T2 Materials", min_value=0, value=1000, step=1)
-n_t3_mats = st.sidebar.number_input("Available T3 Materials", min_value=0, value=500, step=1)
-required_diamonds = st.sidebar.number_input("Required Diamonds", min_value=0, value=355, step=1)
-available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, value=0, step=1)
+n_t2_mats = st.sidebar.number_input("Available T2 Materials", min_value=0, value=1551, step=1)
+n_t3_mats = st.sidebar.number_input("Available T3 Materials", min_value=0, value=794, step=1)
+required_diamonds = st.sidebar.number_input("Required Diamonds", min_value=0, value=225, step=1)
+available_diamonds = st.sidebar.number_input("Available Diamonds", min_value=0, value=3, step=1)
+
+st.sidebar.header("Motivation Mallets")
+
+n_mallets = st.sidebar.number_input("Available Mallets", min_value=0, value=180, step=1)
+noto_break_block = st.sidebar.checkbox("Noto: Break Block (30 mallets)", value=True)
+fantasy_postscript_break_block = st.sidebar.checkbox("Fantasy: Break Block (30 mallets)", value=True)
+fantasy_writing_short_only = st.sidebar.checkbox("Fantasy: Writing Short Only", value=True)
+fantasy_postscript_extend = st.sidebar.checkbox("Fantasy: Extend Postscript (30 mallets)", value=True)
 
 st.sidebar.header("Chart Settings")
 max_cycles_cap = st.sidebar.number_input("Max Cycles Cap (for charts)", min_value=1, value=30, step=1)
@@ -139,73 +184,31 @@ df, n_diamonds_per_cycle, required_cycles = run_simulation(
     n_t3_mats,
     required_diamonds,
     available_diamonds,
+    n_mallets,
+    noto_break_block,
+    fantasy_postscript_break_block,
+    fantasy_writing_short_only,
+    fantasy_postscript_extend,
 )
 
-# --- Summary metrics ---
-col1, col2, col3, col4, col5 = st.columns(5)
-col1.metric("Writing Multiplier", f"{writing_multiplier:.0f}x")
-col2.metric("Noto Multiplier", f"{noto_postscript_multiplier:.0f}x")
-col3.metric("Fantasy Multiplier", f"{fantasy_postscript_multiplier:.0f}x")
-col4.metric("Diamonds per Cycle", f"{n_diamonds_per_cycle:.0f}")
-col5.metric("Required Cycles", f"{required_cycles:.2f}")
-
-# --- Optimal scenario metrics ---
-df["max_cycles"] = df[["n_cycles_t2", "n_cycles_t3"]].min(axis=1)
-best_idx = df["max_cycles"].idxmax()
+# --- Compute derived columns ---
+df["max_cycles_mats"] = df[["n_cycles_t2", "n_cycles_t3"]].min(axis=1)
+df["max_cycles"] = df[["n_cycles_t2", "n_cycles_t3", "n_cycles_mallets"]].min(axis=1)
+best_idx = df["max_cycles_mats"].idxmax()
 best_row = df.loc[best_idx]
 
-col6, col7, col8 = st.columns(3)
-col6.metric("Max Achievable Cycles", f"{best_row['max_cycles']:.2f}")
-col7.metric(
-    "Optimal Fantasy Postscript Hunts",
-    f"T1 = {best_row['n_hunts_t1_fantasy_postscript']:.0f} / T2 = {best_row['n_hunts_t2_fantasy_postscript']:.0f}",
-)
-col8.metric("Total CC Used (Max Cycles)", f"{best_row['n_cc_used']:.0f}")
+# --- Store results in session state for all pages ---
+st.session_state["df"] = df
+st.session_state["best_row"] = best_row
+st.session_state["required_cycles"] = required_cycles
+st.session_state["n_diamonds_per_cycle"] = n_diamonds_per_cycle
+st.session_state["writing_multiplier"] = writing_multiplier
+st.session_state["noto_postscript_multiplier"] = noto_postscript_multiplier
+st.session_state["fantasy_postscript_multiplier"] = fantasy_postscript_multiplier
+st.session_state["n_t2_mats"] = n_t2_mats
+st.session_state["n_t3_mats"] = n_t3_mats
+st.session_state["n_mallets"] = n_mallets
+st.session_state["max_cycles_cap"] = max_cycles_cap
 
-# --- Simulation results table ---
-st.subheader("Simulation Results")
-st.dataframe(df, use_container_width=True)
-
-csv = df.to_csv(index=False)
-st.download_button("Download CSV", csv, "cliffs_lny2026_simulation_data.csv", "text/csv")
-
-# --- Charts ---
-st.subheader("Charts")
-
-chart_df = df.set_index("n_hunts_t2_fantasy_postscript")
-
-st.caption("Net Materials per Cycle")
-st.line_chart(chart_df[["net_t2_mats", "net_t3_mats"]])
-
-st.caption("Max Cycles (T2 & T3)")
-capped_chart_df = chart_df[["n_cycles_t2", "n_cycles_t3"]].clip(upper=max_cycles_cap)
-st.line_chart(capped_chart_df)
-
-st.caption("Condensed Creativity Used")
-st.line_chart(chart_df[["n_cc_used"]])
-
-# --- Materials over cycles chart ---
-st.subheader("Materials Over Cycles")
-
-selected_row = st.selectbox(
-    "Fantasy Postscript T2 Hunts scenario",
-    range(14),
-    index=13,
-    format_func=lambda x: f"T2 Hunts = {x} (T1 Hunts = {13 - x})",
-)
-
-row = df.iloc[selected_row]
-net_t2 = row["net_t2_mats"]
-net_t3 = row["net_t3_mats"]
-max_cycle = int(min(row["n_cycles_t2"], row["n_cycles_t3"], required_cycles)) + 1
-
-cycles = list(range(max_cycle + 1))
-t2_over_cycles = [n_t2_mats + net_t2 * c for c in cycles]
-t3_over_cycles = [n_t3_mats + net_t3 * c for c in cycles]
-
-projection_df = pd.DataFrame(
-    {"T2 Materials": t2_over_cycles, "T3 Materials": t3_over_cycles},
-    index=pd.Index(cycles, name="Cycle"),
-)
-
-st.line_chart(projection_df)
+# --- Run the selected page ---
+page.run()
